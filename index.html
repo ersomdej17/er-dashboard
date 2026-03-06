@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <base target="_top">
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ER Dashboard - Somdej 17</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&family=Kanit:wght@400;600&display=swap" rel="stylesheet">
+    
+    <style>
+        body { font-family: 'Sarabun', sans-serif; background-color: #f3f4f6; }
+        .kanit { font-family: 'Kanit', sans-serif; }
+        #mainIframe { width: 100%; height: 100vh; display: block; border: none; }
+        .hidden { display: none; }
+    </style>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const web_app_url = 'https://script.google.com/macros/s/AKfycbwcBOCVTAcZeZIDX_24IBL9RmH5yMuWcTpce_5uHJNVNguvOfQs7aOjTZACH1M7GUZf/exec';
+            
+            function is_InAppBrowser() {
+                const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+                const isChrome = /Chrome/.test(userAgent);
+                return (!isChrome && /FBAV|FBAN|LINE|Tiktok|Instagram|Twitter|Snapchat|Telegram|MicroMessenger|Threads/i.test(userAgent));
+            }
+
+            const mainIframe = document.getElementById('mainIframe');
+            const urlParams = new URLSearchParams(window.location.search);
+            
+            if (urlParams.has('openExternalBrowser') || !is_InAppBrowser()) {
+                mainIframe.src = web_app_url;
+            } else {
+                document.getElementById('inAppBrowserModal').classList.remove('hidden');
+                mainIframe.style.display = 'none';
+                
+                const urlToRedirect = new URL(window.location.href);
+                urlToRedirect.searchParams.set('openExternalBrowser', '1');
+
+                document.getElementById('confirmButton').addEventListener('click', () => {
+                    window.location.href = urlToRedirect.toString();
+                });
+
+                document.getElementById('copyLinkButton').addEventListener('click', async () => {
+                    await navigator.clipboard.writeText(urlToRedirect.toString());
+                    const msg = document.getElementById('copyMessage');
+                    msg.classList.remove('hidden');
+                    setTimeout(() => msg.classList.add('hidden'), 2000);
+                });
+            }
+        });
+    </script>
+</head>
+<body class="overflow-hidden">
+
+    <div id="inAppBrowserModal" class="fixed inset-0 bg-gray-900 bg-opacity-80 z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-3xl shadow-2xl w-full max-w-sm p-8 text-center">
+            <div class="mb-6">
+                <div class="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto">
+                    <i class="fa-solid fa-bolt-lightning text-red-600 text-4xl"></i>
+                </div>
+            </div>
+            <h2 class="text-2xl font-bold text-gray-800 mb-2 kanit">เปิดในเบราว์เซอร์หลัก</h2>
+            <p class="text-gray-500 mb-6 text-sm">เพื่อการแสดงผลรูปภาพและข้อมูลที่รวดเร็ว กรุณาเปิดผ่าน Chrome หรือ Safari นะคะ</p>
+            
+            <div class="flex flex-col gap-3">
+                <button id="confirmButton" class="w-full py-3 rounded-xl font-semibold text-white bg-red-600 hover:bg-red-700 transition-all">
+                    เปิดเบราว์เซอร์
+                </button>
+                <button id="copyLinkButton" class="w-full py-3 rounded-xl font-semibold text-gray-600 bg-gray-100 hover:bg-gray-200 transition-all">
+                    คัดลอกลิงก์
+                </button>
+                <span id="copyMessage" class="text-green-600 text-sm font-medium hidden animate-bounce">คัดลอกสำเร็จ!</span>
+            </div>
+        </div>
+    </div>
+
+    <iframe id="mainIframe" scrolling="yes" src="" allow="clipboard-write"></iframe>
+
+</body>
+</html>
